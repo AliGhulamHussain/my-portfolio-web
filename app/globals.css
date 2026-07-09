@@ -397,3 +397,17 @@ body.deck-focus .hud-dim {
 /* explicit face toggle — replaces reliance on backface-visibility */
 .card-shell.is-back .card-front { visibility: hidden; }
 .card-shell:not(.is-back) .card-back { visibility: hidden; }
+
+/* drei's Html wrapper divs are invisible pass-throughs, but once they
+   share the preserve-3d context above they become coplanar with the card
+   and can steal hit-testing from it. Only .card-shell (and below) should
+   ever be clickable. */
+.card-html,
+.card-html > div,
+.card-html > div > div,
+.card-html > div > div > div {
+  pointer-events: none !important;
+}
+.card-shell {
+  pointer-events: auto !important;
+}
