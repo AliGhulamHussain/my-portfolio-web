@@ -1,0 +1,399 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --canvas: #f3f5fa;
+  --surface: #ffffff;
+  --ink: #10151f;
+  --muted: #5f6774;
+  --line: #e2e7f0;
+  --accent: #2e5bff;
+  --accent-2: #0fb5a0;
+  --violet: #7c3aed;
+  --card-w: 280px;
+  --card-h: 400px;
+}
+
+html {
+  scroll-behavior: auto; /* Lenis owns scrolling */
+}
+
+body {
+  background:
+    radial-gradient(900px 600px at 12% -5%, rgba(46, 91, 255, 0.09), transparent 60%),
+    radial-gradient(800px 550px at 88% 8%, rgba(15, 181, 160, 0.08), transparent 60%),
+    radial-gradient(700px 500px at 50% 110%, rgba(124, 58, 237, 0.06), transparent 60%),
+    var(--canvas);
+  overscroll-behavior-y: none;
+}
+
+/* Fixed WebGL layer behind the page. pointer-events re-enabled on cards. */
+.webgl-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.content-layer {
+  position: relative;
+  z-index: 10;
+  pointer-events: none; /* headings float over the deck; links re-enable */
+}
+.content-layer a,
+.content-layer button {
+  pointer-events: auto;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+a:focus-visible,
+button:focus-visible,
+.card-shell:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   THE CARD
+   ════════════════════════════════════════════════════════════ */
+
+.card-shell {
+  width: var(--card-w);
+  height: var(--card-h);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card3d {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+
+/* ── FRONT ── */
+.card-front {
+  background: linear-gradient(168deg, #ffffff 0%, #f7f9ff 100%);
+  border: 1px solid var(--line);
+  box-shadow:
+    0 1px 2px rgba(16, 21, 31, 0.05),
+    0 24px 48px -12px rgba(30, 45, 90, 0.22);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.3s ease;
+}
+
+.card-shell:hover .card-front {
+  box-shadow:
+    0 1px 2px rgba(16, 21, 31, 0.05),
+    0 32px 64px -12px rgba(46, 91, 255, 0.3);
+}
+
+.card-corner {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  line-height: 1.15;
+}
+.card-corner-tl {
+  top: 12px;
+  left: 12px;
+}
+.card-corner-br {
+  bottom: 12px;
+  right: 12px;
+  transform: rotate(180deg);
+}
+.card-corner-glyph {
+  font-size: 13px;
+}
+
+.card-watermark {
+  position: absolute;
+  right: -22px;
+  top: -30px;
+  font-size: 150px;
+  line-height: 1;
+  color: rgba(46, 91, 255, 0.055);
+  user-select: none;
+}
+
+.card-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 40px 26px 34px;
+}
+
+.card-suit {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-top: 8px;
+}
+
+.card-subtitle {
+  font-size: 12.5px;
+  color: var(--accent);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+.card-text {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--muted);
+  margin-top: 12px;
+}
+
+.card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.card-chip {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+  background: rgba(46, 91, 255, 0.07);
+  border: 1px solid rgba(46, 91, 255, 0.16);
+  border-radius: 999px;
+  padding: 4px 9px;
+  white-space: nowrap;
+}
+
+.card-hint {
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(95, 103, 116, 0.65);
+}
+
+.card-details {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  animation: details-in 0.45s ease both;
+}
+.card-details p {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.card-link {
+  display: inline-block;
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 999px;
+  padding: 7px 14px;
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+.card-link:hover {
+  background: #1e46e0;
+  transform: translateY(-1px);
+}
+
+@keyframes details-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  transition: color 0.2s, border-color 0.2s;
+}
+.card-close:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ── BACK — shared holographic deck design ── */
+.card-back {
+  transform: rotateY(180deg);
+  padding: 7px;
+  background: linear-gradient(
+    130deg,
+    var(--accent) 0%,
+    var(--violet) 45%,
+    var(--accent-2) 100%
+  );
+  box-shadow: 0 24px 48px -12px rgba(30, 45, 90, 0.28);
+}
+
+.card-back-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  background: #fdfdff;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.card-back-pattern {
+  position: absolute;
+  inset: 10px;
+  border-radius: 8px;
+  background-image:
+    radial-gradient(rgba(46, 91, 255, 0.28) 1px, transparent 1.5px),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 17px,
+      rgba(46, 91, 255, 0.07) 17px 18px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 17px,
+      rgba(46, 91, 255, 0.07) 17px 18px
+    );
+  background-size: 18px 18px, auto, auto;
+  mask-image: radial-gradient(circle at center, transparent 26%, #000 60%);
+  -webkit-mask-image: radial-gradient(circle at center, transparent 26%, #000 60%);
+}
+
+.card-back-center {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.card-back-glyph {
+  font-size: 26px;
+  color: var(--accent);
+}
+.card-back-monogram {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  background: linear-gradient(120deg, var(--accent), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.card-back-caption {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.34em;
+  color: var(--muted);
+}
+
+/* ════════════════════════════════════════════════════════════
+   FOCUS MODE
+   ════════════════════════════════════════════════════════════ */
+
+.card-shell {
+  transition: opacity 0.45s ease, filter 0.45s ease;
+}
+body.deck-focus .card-shell:not(.is-focused) {
+  opacity: 0.16;
+  filter: blur(2px) saturate(0.6);
+  pointer-events: none !important;
+}
+body.deck-focus .content-layer,
+body.deck-focus .hud-dim {
+  opacity: 0.25;
+  transition: opacity 0.45s ease;
+}
+
+.focus-catch {
+  position: absolute;
+  inset: 0;
+  z-index: 16776500; /* above resting cards, below the focused one */
+  pointer-events: auto;
+  background: transparent;
+  border: 0;
+  cursor: zoom-out;
+}
+
+/* Reduced-motion static grid */
+.static-card {
+  cursor: default;
+}
+.static-card .card-back,
+.static-card .card-close {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* keep the 3D chain unbroken through drei's Html wrappers */
+.card-html > div > div { transform-style: preserve-3d; }
+.card-shell { transform-style: preserve-3d; }
+
+/* explicit face toggle — replaces reliance on backface-visibility */
+.card-shell.is-back .card-front { visibility: hidden; }
+.card-shell:not(.is-back) .card-back { visibility: hidden; }
