@@ -24,7 +24,7 @@ export default function Home() {
     <SmoothScroll>
       <header className="fixed top-0 inset-x-0 z-30 flex items-center justify-between px-6 md:px-10 py-5 pointer-events-none">
         <a href="#" className="font-display font-bold tracking-wide text-sm pointer-events-auto">
-          AGH<span className="text-accent">.deck</span>
+          AGH<span className="text-accent"></span>
         </a>
         <a
           href="mailto:alighulamhussain007@gmail.com"

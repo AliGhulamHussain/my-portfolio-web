@@ -20,7 +20,7 @@ export function Hero() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.8 }}
       >
-        Portfolio deck · {CARDS.length} cards
+        Portfolio · {CARDS.length} cards
       </motion.p>
 
       <h1 className="font-display font-semibold tracking-tight text-[clamp(2.5rem,7.5vw,5.6rem)] leading-[1.02]">
@@ -156,7 +156,7 @@ export function Footer() {
         </a>
       </p>
       <p className="text-xs text-muted mt-4">
-        © {new Date().getFullYear()} Ali Ghulam Hussain — dealt from Badin, Sindh.
+        © {new Date().getFullYear()} Ali Ghulam Hussain — dealt from Hyderabad, Sindh.
       </p>
     </footer>
   );
