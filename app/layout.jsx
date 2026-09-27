@@ -1,10 +1,11 @@
-import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const grotesk = Space_Grotesk({
+const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: ["400", "500", "600", "700"],
+  axes: ["opsz", "SOFT"],
+  style: ["normal", "italic"],
 });
 
 const inter = Inter({
@@ -19,18 +20,18 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "Ali Ghulam Hussain — Full-Stack Developer",
+  title: "Ali Ghulam Hussain — Full Stack Developer & AI Engineer",
   description:
-    "Final-year CS student at the University of Sindh who builds and ships real production software. 8+ systems delivered for real businesses and institutions in Pakistan and internationally.",
+    "Final-year CS student at the University of Sindh and founder of eduKtion, a school management SaaS running in live institutions. 2+ years shipping production software for real clients in Pakistan and internationally.",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${grotesk.variable} ${inter.variable} ${mono.variable}`}
+      className={`${fraunces.variable} ${inter.variable} ${mono.variable}`}
     >
-      <body className="bg-canvas text-ink font-body antialiased selection:bg-accent/20 selection:text-ink">
+      <body className="bg-canvas text-ink font-body antialiased selection:bg-accent/30 selection:text-ink">
         {children}
       </body>
     </html>

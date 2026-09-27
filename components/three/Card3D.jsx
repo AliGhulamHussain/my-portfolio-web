@@ -21,6 +21,7 @@ export default function Card3D({ card, index, focusedId, onFocus, onClose }) {
   const group = useRef();
   const shellRef = useRef(null);
   const actRef = useRef(0);
+  const shadow = useRef([0, 22]);
   const { camera } = useThree();
 
   const focused = focusedId === card.id;
@@ -64,12 +65,15 @@ export default function Card3D({ card, index, focusedId, onFocus, onClose }) {
       actRef.current = act;
       target = [x, y, z, rx, ry, rz, s];
 
-      // Hover lift — only when the card is properly dealt out
+      // Hover lift — only when the card is properly dealt out.
+      // Raises, straightens, and tilts its near edge toward the cursor.
       if (interaction.hoveredId === card.id && act > 0.75 && !focusedId) {
         target[1] += 0.28;
         target[2] += 0.45;
         target[5] *= 0.4; // straighten
         target[6] = 1.05;
+        target[4] += interaction.tilt.x * 0.22;
+        target[3] += interaction.tilt.y * 0.18;
       }
 
       // Whole tableau leans gently toward the cursor
@@ -80,14 +84,28 @@ export default function Card3D({ card, index, focusedId, onFocus, onClose }) {
 
     stepSpring(spring, target, delta);
     const s = spring.x;
-    group.current.position.set(s[0], s[1], s[2]);
-    group.current.rotation.set(s[3], s[4], s[5]);
-    group.current.scale.setScalar(s[6]);
 
-    // Front face normal is +z; after rotating by ry its z-component is cos(ry).
-    // Negative = card faces away from the camera → show the back.
-    if (shellRef.current) {
-      shellRef.current.classList.toggle("is-back", Math.cos(s[4]) < 0);
+    // Edge-on during a flip the card bows toward the lens a touch —
+    // the perspective "snap" a real card has mid-turn.
+    const edge = 1 - Math.abs(Math.cos(s[4]));
+    group.current.position.set(s[0], s[1], s[2] + edge * 0.35);
+    group.current.rotation.set(s[3], s[4], s[5]);
+    group.current.scale.set(s[6], s[6] * (1 + edge * 0.06), s[6]);
+
+    const el = shellRef.current;
+    if (el) {
+      // Front face normal is +z; after rotating by ry its z-component is cos(ry).
+      // Negative = card faces away from the camera → show the back.
+      el.classList.toggle("is-back", Math.cos(s[4]) < 0);
+
+      // Shadow falls away from the tilt (quantised to avoid style churn)
+      const sx = Math.round(-Math.sin(s[4]) * 26 - Math.sin(s[5]) * 18);
+      const sy = Math.round(22 + s[3] * 50 + (s[2] + 1) * 2);
+      if (sx !== shadow.current[0] || sy !== shadow.current[1]) {
+        shadow.current = [sx, sy];
+        el.style.setProperty("--sx", sx);
+        el.style.setProperty("--sy", sy);
+      }
     }
   });
 
@@ -105,8 +123,16 @@ export default function Card3D({ card, index, focusedId, onFocus, onClose }) {
           className={`card-shell is-back ${focused ? "is-focused" : ""}`}
           style={{ pointerEvents: "auto" }}
           onPointerEnter={() => (interaction.hoveredId = card.id)}
+          onPointerMove={(e) => {
+            const r = e.currentTarget.getBoundingClientRect();
+            interaction.tilt.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+            interaction.tilt.y = ((e.clientY - r.top) / r.height) * 2 - 1;
+          }}
           onPointerLeave={() => {
-            if (interaction.hoveredId === card.id) interaction.hoveredId = null;
+            if (interaction.hoveredId === card.id) {
+              interaction.hoveredId = null;
+              interaction.tilt.x = interaction.tilt.y = 0;
+            }
           }}
           onClick={() => (focused ? onClose() : onFocus(card.id))}
           role="button"

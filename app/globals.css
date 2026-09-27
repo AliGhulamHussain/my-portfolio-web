@@ -3,16 +3,31 @@
 @tailwind utilities;
 
 :root {
-  --canvas: #f3f5fa;
-  --surface: #ffffff;
-  --ink: #10151f;
-  --muted: #5f6774;
-  --line: #e2e7f0;
-  --accent: #2e5bff;
-  --accent-2: #0fb5a0;
-  --violet: #7c3aed;
+  /* page */
+  --bg: #0a0a0f;
+  --text: #ededed;
+  --muted: #8a8f98;
+  --line: rgba(255, 255, 255, 0.08);
+  --accent: #6e8bff;
+  --violet: #9b7bff;
+  --teal: #3fd3c0;
+  --holo: linear-gradient(120deg, var(--accent) 0%, var(--violet) 50%, var(--teal) 100%);
+
+  /* on the card (paper) */
+  --paper: #f8f6f0;
+  --card-ink: #16161c;
+  --card-muted: #625f58;
+  --card-line: #e4dfd2;
+  --card-accent: #3f5bd9; /* deeper accent — legible on paper */
+
   --card-w: 280px;
   --card-h: 400px;
+
+  /* no linear, no default ease-in-out */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-lift: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 html {
@@ -21,11 +36,24 @@ html {
 
 body {
   background:
-    radial-gradient(900px 600px at 12% -5%, rgba(46, 91, 255, 0.09), transparent 60%),
-    radial-gradient(800px 550px at 88% 8%, rgba(15, 181, 160, 0.08), transparent 60%),
-    radial-gradient(700px 500px at 50% 110%, rgba(124, 58, 237, 0.06), transparent 60%),
-    var(--canvas);
+    radial-gradient(1100px 700px at 50% 118%, rgba(20, 44, 30, 0.55), transparent 65%),
+    radial-gradient(900px 600px at 10% -10%, rgba(110, 139, 255, 0.08), transparent 60%),
+    radial-gradient(800px 550px at 92% 4%, rgba(155, 123, 255, 0.06), transparent 60%),
+    var(--bg);
+  color: var(--text);
   overscroll-behavior-y: none;
+}
+
+/* Film grain over everything — kills the flat digital look */
+body::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  z-index: 60;
+  pointer-events: none;
+  background-image: var(--noise);
+  opacity: 0.06;
+  mix-blend-mode: overlay;
 }
 
 /* Fixed WebGL layer behind the page. pointer-events re-enabled on cards. */
@@ -48,10 +76,16 @@ body {
 
 .eyebrow {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.22em;
+  font-size: 0.66rem;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--muted);
+}
+
+.display {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  letter-spacing: 0.01em;
 }
 
 a:focus-visible,
@@ -71,6 +105,10 @@ button:focus-visible,
   height: var(--card-h);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  /* --sx / --sy are written per frame from Card3D so the shadow
+     falls away from the card's current tilt */
+  --sx: 0;
+  --sy: 22;
 }
 
 .card3d {
@@ -83,7 +121,7 @@ button:focus-visible,
 .card-face {
   position: absolute;
   inset: 0;
-  border-radius: 18px;
+  border-radius: 16px;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   overflow: hidden;
@@ -91,20 +129,45 @@ button:focus-visible,
 
 /* ── FRONT ── */
 .card-front {
-  background: linear-gradient(168deg, #ffffff 0%, #f7f9ff 100%);
-  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--card-ink);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow:
-    0 1px 2px rgba(16, 21, 31, 0.05),
-    0 24px 48px -12px rgba(30, 45, 90, 0.22);
+    0 1px 1px rgba(0, 0, 0, 0.35),
+    calc(var(--sx) * 1px) calc(var(--sy) * 1px) 44px -14px rgba(0, 0, 0, 0.7);
   display: flex;
   flex-direction: column;
-  transition: box-shadow 0.3s ease;
+  transition: box-shadow 0.5s var(--ease-out);
+}
+
+/* paper tooth */
+.card-front::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--noise);
+  opacity: 0.22;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+/* holographic hairline across the top */
+.card-front::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  top: 0;
+  height: 2px;
+  border-radius: 0 0 2px 2px;
+  background: var(--holo);
 }
 
 .card-shell:hover .card-front {
   box-shadow:
-    0 1px 2px rgba(16, 21, 31, 0.05),
-    0 32px 64px -12px rgba(46, 91, 255, 0.3);
+    0 1px 1px rgba(0, 0, 0, 0.35),
+    calc(var(--sx) * 1.6px) calc(var(--sy) * 1.9px) 70px -12px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(110, 139, 255, 0.25);
 }
 
 .card-corner {
@@ -112,34 +175,35 @@ button:focus-visible,
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
+  gap: 2px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.04em;
-  color: var(--accent);
-  line-height: 1.15;
+  letter-spacing: 0.08em;
+  color: var(--card-ink);
+  line-height: 1.1;
 }
 .card-corner-tl {
-  top: 12px;
-  left: 12px;
+  top: 14px;
+  left: 13px;
 }
 .card-corner-br {
-  bottom: 12px;
-  right: 12px;
+  bottom: 14px;
+  right: 13px;
   transform: rotate(180deg);
 }
 .card-corner-glyph {
-  font-size: 13px;
+  font-size: 12px;
+  color: var(--card-accent);
 }
 
 .card-watermark {
   position: absolute;
-  right: -22px;
-  top: -30px;
+  right: -18px;
+  top: -26px;
   font-size: 150px;
   line-height: 1;
-  color: rgba(46, 91, 255, 0.055);
+  color: rgba(22, 22, 28, 0.045);
   user-select: none;
 }
 
@@ -148,100 +212,125 @@ button:focus-visible,
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 40px 26px 34px;
+  padding: 44px 28px 36px;
 }
 
 .card-suit {
   font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.26em;
+  font-size: 9px;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--card-muted);
 }
 
 .card-title {
   font-family: var(--font-display);
-  font-size: 25px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-  margin-top: 8px;
+  font-variation-settings: "opsz" 72, "SOFT" 30;
+  font-size: 27px;
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: 0.005em;
+  color: var(--card-ink);
+  margin-top: 10px;
 }
 
 .card-subtitle {
-  font-size: 12.5px;
-  color: var(--accent);
-  margin-top: 2px;
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 13.5px;
+  color: var(--card-accent);
+  margin-top: 5px;
 }
 
 .card-text {
-  font-size: 12.5px;
-  line-height: 1.55;
-  color: var(--muted);
-  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--card-muted);
+  margin-top: 14px;
 }
 
 .card-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 14px;
+  gap: 5px;
+  margin-top: 16px;
 }
 
 .card-chip {
   font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.03em;
-  color: var(--ink);
-  background: rgba(46, 91, 255, 0.07);
-  border: 1px solid rgba(46, 91, 255, 0.16);
-  border-radius: 999px;
-  padding: 4px 9px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--card-ink);
+  border: 1px solid var(--card-line);
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 4px;
+  padding: 3px 7px;
   white-space: nowrap;
 }
 
 .card-hint {
   margin-top: auto;
   font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.2em;
+  font-size: 9px;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: rgba(95, 103, 116, 0.65);
+  color: rgba(98, 95, 88, 0.6);
+}
+
+/* open card: details can run long — let them scroll inside */
+.card3d.is-open .card-body {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--card-line) transparent;
 }
 
 .card-details {
   margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px dashed var(--line);
-  animation: details-in 0.45s ease both;
+  padding-top: 14px;
+  border-top: 1px solid var(--card-line);
+  animation: details-in 0.6s var(--ease-out) both;
 }
 .card-details p {
-  font-size: 12px;
-  line-height: 1.55;
-  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--card-muted);
+}
+.card-sublinks {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.card-sublinks a {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--card-accent);
+  text-decoration: underline;
+  text-decoration-color: rgba(63, 91, 217, 0.3);
+  text-underline-offset: 3px;
 }
 .card-link {
   display: inline-block;
-  margin-top: 10px;
+  margin-top: 12px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 500;
-  color: #fff;
-  background: var(--accent);
+  letter-spacing: 0.04em;
+  color: var(--paper);
+  background: var(--card-ink);
   border-radius: 999px;
-  padding: 7px 14px;
-  transition: background 0.25s ease, transform 0.25s ease;
+  padding: 8px 15px;
+  transition: background 0.35s var(--ease-out), transform 0.35s var(--ease-lift);
 }
 .card-link:hover {
-  background: #1e46e0;
+  background: var(--card-accent);
   transform: translateY(-1px);
 }
 
 @keyframes details-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -251,68 +340,73 @@ button:focus-visible,
 
 .card-close {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 11px;
+  right: 11px;
+  z-index: 2;
   width: 26px;
   height: 26px;
   border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--muted);
+  border: 1px solid var(--card-line);
+  background: var(--paper);
+  color: var(--card-muted);
   font-size: 11px;
   line-height: 1;
   display: grid;
   place-items: center;
-  transition: color 0.2s, border-color 0.2s;
+  transition: color 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
 }
 .card-close:hover {
-  color: var(--accent);
-  border-color: var(--accent);
+  color: var(--card-accent);
+  border-color: var(--card-accent);
 }
 
 /* ── BACK — shared holographic deck design ── */
 .card-back {
   transform: rotateY(180deg);
-  padding: 7px;
-  background: linear-gradient(
-    130deg,
-    var(--accent) 0%,
-    var(--violet) 45%,
-    var(--accent-2) 100%
-  );
-  box-shadow: 0 24px 48px -12px rgba(30, 45, 90, 0.28);
+  padding: 6px;
+  background: var(--holo);
+  box-shadow: calc(var(--sx) * 1px) calc(var(--sy) * 1px) 44px -14px rgba(0, 0, 0, 0.75);
 }
 
 .card-back-inner {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 12px;
-  background: #fdfdff;
+  border-radius: 11px;
+  background: #fdfdfb;
   overflow: hidden;
   display: grid;
   place-items: center;
 }
 
+/* holographic sheen */
+.card-back-inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(110, 139, 255, 0.12) 45%,
+    rgba(63, 211, 192, 0.12) 55%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* circuit dots + traces */
 .card-back-pattern {
   position: absolute;
-  inset: 10px;
-  border-radius: 8px;
+  inset: 12px;
+  border-radius: 7px;
+  border: 1px solid rgba(110, 139, 255, 0.18);
   background-image:
-    radial-gradient(rgba(46, 91, 255, 0.28) 1px, transparent 1.5px),
-    repeating-linear-gradient(
-      0deg,
-      transparent 0 17px,
-      rgba(46, 91, 255, 0.07) 17px 18px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent 0 17px,
-      rgba(46, 91, 255, 0.07) 17px 18px
-    );
+    radial-gradient(rgba(63, 91, 217, 0.32) 1.1px, transparent 1.6px),
+    repeating-linear-gradient(0deg, transparent 0 17px, rgba(63, 91, 217, 0.06) 17px 18px),
+    repeating-linear-gradient(90deg, transparent 0 35px, rgba(63, 91, 217, 0.06) 35px 36px);
   background-size: 18px 18px, auto, auto;
-  mask-image: radial-gradient(circle at center, transparent 26%, #000 60%);
-  -webkit-mask-image: radial-gradient(circle at center, transparent 26%, #000 60%);
+  mask-image: radial-gradient(circle at center, transparent 28%, #000 62%);
+  -webkit-mask-image: radial-gradient(circle at center, transparent 28%, #000 62%);
 }
 
 .card-back-center {
@@ -320,27 +414,30 @@ button:focus-visible,
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 .card-back-glyph {
-  font-size: 26px;
-  color: var(--accent);
+  font-size: 18px;
+  color: var(--card-accent);
 }
 .card-back-monogram {
   font-family: var(--font-display);
-  font-size: 30px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  background: linear-gradient(120deg, var(--accent), var(--violet));
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  font-style: italic;
+  font-size: 46px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  background: var(--holo);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 .card-back-caption {
   font-family: var(--font-mono);
-  font-size: 8px;
-  letter-spacing: 0.34em;
-  color: var(--muted);
+  font-size: 7.5px;
+  letter-spacing: 0.4em;
+  color: var(--card-muted);
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -348,36 +445,147 @@ button:focus-visible,
    ════════════════════════════════════════════════════════════ */
 
 .card-shell {
-  transition: opacity 0.45s ease, filter 0.45s ease;
+  transition: opacity 0.5s var(--ease-out);
 }
 body.deck-focus .card-shell:not(.is-focused) {
-  opacity: 0.16;
-  filter: blur(2px) saturate(0.6);
+  opacity: 0.25;
   pointer-events: none !important;
 }
 body.deck-focus .content-layer,
 body.deck-focus .hud-dim {
-  opacity: 0.25;
-  transition: opacity 0.45s ease;
+  opacity: 0.2;
+  transition: opacity 0.5s var(--ease-out);
 }
 
+/* dims + blurs everything behind the focused card in one pass */
 .focus-catch {
   position: absolute;
   inset: 0;
   z-index: 16776500; /* above resting cards, below the focused one */
   pointer-events: auto;
-  background: transparent;
   border: 0;
   cursor: zoom-out;
+  background: rgba(10, 10, 15, 0.55);
+  backdrop-filter: blur(8px) saturate(0.7);
+  -webkit-backdrop-filter: blur(8px) saturate(0.7);
+  animation: fade-in 0.5s var(--ease-out) both;
 }
 
-/* Reduced-motion static grid */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   CURSOR
+   ════════════════════════════════════════════════════════════ */
+
+@media (pointer: fine) {
+  html.has-cursor,
+  html.has-cursor * {
+    cursor: none !important;
+  }
+}
+
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 70;
+  pointer-events: none;
+  border-radius: 999px;
+}
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: var(--text);
+}
+.cursor-ring {
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border: 1px solid rgba(237, 237, 237, 0.35);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  color: transparent;
+  transition:
+    width 0.45s var(--ease-lift),
+    height 0.45s var(--ease-lift),
+    margin 0.45s var(--ease-lift),
+    background 0.35s var(--ease-out),
+    border-color 0.35s var(--ease-out),
+    color 0.35s var(--ease-out);
+}
+.cursor-ring.is-card {
+  width: 68px;
+  height: 68px;
+  margin: -34px 0 0 -34px;
+  border-color: rgba(110, 139, 255, 0.7);
+  background: rgba(110, 139, 255, 0.12);
+  backdrop-filter: blur(2px);
+  color: var(--text);
+}
+.cursor-ring.is-link {
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-color: var(--accent);
+}
+
+/* ════════════════════════════════════════════════════════════
+   LOADER — cards assembling into the deck
+   ════════════════════════════════════════════════════════════ */
+
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+}
+.loader-stack {
+  position: relative;
+  width: 70px;
+  height: 100px;
+}
+.loader-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  padding: 2px;
+  background: var(--holo);
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.8);
+}
+.loader-card::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 4px;
+  background:
+    radial-gradient(rgba(63, 91, 217, 0.35) 0.8px, transparent 1.2px) 0 0 / 7px 7px,
+    #fdfdfb;
+}
+
+/* ════════════════════════════════════════════════════════════
+   REDUCED MOTION — static grid
+   ════════════════════════════════════════════════════════════ */
+
 .static-card {
   cursor: default;
 }
 .static-card .card-back,
 .static-card .card-close {
   display: none;
+}
+.static-card .card-body {
+  overflow-y: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {

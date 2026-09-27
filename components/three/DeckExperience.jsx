@@ -8,7 +8,7 @@ import Card3D from "./Card3D";
 import { CARDS, ZONES } from "@/lib/deck";
 import { scrollState } from "@/lib/scrollState";
 
-const ACCENT = "#2E5BFF";
+const ACCENT = "#6E8BFF";
 
 /* ── Camera: subtle per-zone dolly + mouse parallax ─────────── */
 const STOPS = [
@@ -104,10 +104,33 @@ function Motes() {
         size={0.05}
         sizeAttenuation
         transparent
-        opacity={0.4}
+        opacity={0.28}
         depthWrite={false}
       />
     </points>
+  );
+}
+
+/* ── Table felt: a soft green pool of light under the deck ──── */
+function Felt() {
+  const tex = useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 256;
+    const g = c.getContext("2d");
+    const r = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+    r.addColorStop(0, "rgba(22, 46, 32, 0.9)");
+    r.addColorStop(0.55, "rgba(12, 26, 18, 0.45)");
+    r.addColorStop(1, "rgba(10, 15, 12, 0)");
+    g.fillStyle = r;
+    g.fillRect(0, 0, 256, 256);
+    return new THREE.CanvasTexture(c);
+  }, []);
+
+  return (
+    <mesh position={[0, -4.62, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[34, 20]} />
+      <meshBasicMaterial map={tex} transparent depthWrite={false} />
+    </mesh>
   );
 }
 
@@ -151,16 +174,17 @@ export default function DeckExperience() {
             position={[0, -4.6, 0]}
             args={[60, 60]}
             cellSize={1.1}
-            cellThickness={0.6}
-            cellColor="#D7DEEC"
+            cellThickness={0.5}
+            cellColor="#161A22"
             sectionSize={5.5}
-            sectionThickness={1}
-            sectionColor="#B9C6E4"
+            sectionThickness={0.9}
+            sectionColor="#232B3D"
             fadeDistance={34}
             fadeStrength={2.5}
             infiniteGrid
           />
 
+          <Felt />
           <Motes />
 
           {CARDS.map((card, i) => (

@@ -29,7 +29,7 @@ export default function CardFace({ card, focused = false, onClose }) {
           {suit.glyph}
         </span>
 
-        <div className="card-body">
+        <div className="card-body" data-lenis-prevent={focused || undefined}>
           <p className="card-suit">{suit.name}</p>
           <h3 className="card-title">{card.title}</h3>
           <p className="card-subtitle">{card.subtitle}</p>
@@ -46,6 +46,21 @@ export default function CardFace({ card, focused = false, onClose }) {
           {focused ? (
             <div className="card-details">
               <p>{card.details}</p>
+              {card.links && (
+                <div className="card-sublinks">
+                  {card.links.map((l) => (
+                    <a
+                      key={l.href}
+                      href={l.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {l.label} ↗
+                    </a>
+                  ))}
+                </div>
+              )}
               {card.link && (
                 <a
                   href={card.link}
@@ -84,7 +99,7 @@ export default function CardFace({ card, focused = false, onClose }) {
           <div className="card-back-center">
             <span className="card-back-glyph">◈</span>
             <span className="card-back-monogram">AGH</span>
-            <span className="card-back-caption">PORTFOLIO&nbsp;DECK</span>
+            <span className="card-back-caption">FULL&nbsp;STACK&nbsp;·&nbsp;AI</span>
           </div>
         </div>
       </div>

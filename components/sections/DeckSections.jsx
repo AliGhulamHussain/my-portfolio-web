@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import SplitText from "@/components/ui/SplitText";
 import CardFace from "@/components/ui/CardFace";
-import { SECTIONS, ZONES, CARDS, ZONE_COUNTS, CONTACT_INFO, CLOSING_LINE } from "@/lib/deck";
+import { SECTIONS, SUITS, ZONES, CARDS, ZONE_COUNTS, CONTACT_INFO, CLOSING_LINE } from "@/lib/deck";
 import { scrollState } from "@/lib/scrollState";
 
 /* ── Hero overlay (scrolls away as the dealing begins) ──────── */
@@ -18,30 +18,33 @@ export function Hero() {
         className="eyebrow mb-5"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.8 }}
+        transition={{ delay: 2.3, duration: 0.8 }}
       >
-        Portfolio · {CARDS.length} cards
+        Portfolio · {CARDS.length} cards · Badin, Sindh
       </motion.p>
 
-      <h1 className="font-display font-semibold tracking-tight text-[clamp(2.5rem,7.5vw,5.6rem)] leading-[1.02]">
-        <SplitText text="Ali Ghulam Hussain" delay={0.35} />
+      <h1 className="display font-light text-[clamp(3rem,8.5vw,7.25rem)] leading-[0.95]">
+        <SplitText text="Ali Ghulam Hussain" delay={2.4} />
       </h1>
 
       <motion.p
-        className="mt-5 text-lg md:text-xl text-ink/80"
+        className="mt-7 text-base md:text-lg text-ink/75 max-w-xl"
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.35, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ delay: 3.2, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
       >
-        Full-Stack Developer —{" "}
-        <span className="text-accent">I build real software for real businesses.</span>
+        <span className="display italic text-ink text-xl md:text-2xl">
+          {CONTACT_INFO.role}
+        </span>
+        <br />
+        Founder of eduKtion. I build real software for real businesses.
       </motion.p>
 
       <motion.p
-        className="mt-4 font-mono text-xs text-muted tracking-widest uppercase"
+        className="mt-6 font-mono text-[10px] text-muted tracking-[0.3em] uppercase"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.9, duration: 0.8 }}
+        transition={{ delay: 3.6, duration: 0.8 }}
       >
         Scroll to deal · Click any card to open
       </motion.p>
@@ -53,7 +56,7 @@ export function Hero() {
 const HEADINGS = {
   about: { kicker: "Identity", line: "Three cards about me." },
   skills: { kicker: "Skills", line: "The hand I play with." },
-  projects: { kicker: "Projects", line: "Dealt one by one — watch the table." },
+  projects: { kicker: "Projects", line: "Shipped work, dealt one by one." },
   contact: { kicker: "Contact", line: "Your cards. Take one." },
 };
 
@@ -64,15 +67,18 @@ export function ZoneSections() {
         <section key={s.id} style={{ height: `${s.vh}vh` }} className="relative">
           <div className="sticky top-0 h-screen pointer-events-none px-6 md:px-12 py-24 flex flex-col justify-between">
             <div className="max-w-xs">
-              <p className="eyebrow">{HEADINGS[s.id].kicker}</p>
-              <p className="font-display text-xl md:text-2xl font-medium mt-2 text-ink/85">
+              <p className="eyebrow">
+                <span className="text-accent mr-2">{SUITS[s.id].glyph}</span>
+                {HEADINGS[s.id].kicker}
+              </p>
+              <p className="display font-light text-2xl md:text-[2rem] leading-tight mt-3 text-ink/90">
                 {HEADINGS[s.id].line}
               </p>
             </div>
             {s.id === "contact" && (
-              <p className="font-display text-center text-[clamp(1.6rem,4vw,2.8rem)] font-medium text-ink/90 pb-6">
+              <p className="display font-light text-center text-[clamp(2rem,5vw,3.6rem)] text-ink pb-6">
                 Let&apos;s build something{" "}
-                <span className="text-accent">real.</span>
+                <span className="italic text-accent">real.</span>
               </p>
             )}
           </div>
@@ -123,7 +129,7 @@ export function HUD() {
     <div className="fixed bottom-5 left-5 z-30 pointer-events-none">
       <span
         ref={ref}
-        className="font-mono text-[10px] tracking-[0.18em] text-muted bg-surface/70 backdrop-blur px-3 py-1.5 rounded-full border border-line"
+        className="font-mono text-[10px] tracking-[0.2em] text-muted bg-canvas/60 backdrop-blur-md px-3.5 py-2 rounded-full border border-white/[0.07] whitespace-pre"
       >
         ZONE · THE DECK — DEALT 00/{CARDS.length}
       </span>
@@ -135,7 +141,7 @@ export function HUD() {
 export function Footer() {
   return (
     <footer className="relative z-20 px-6 py-10 text-center">
-      <p className="font-display italic text-sm md:text-base text-ink/70 max-w-xl mx-auto mb-8">
+      <p className="display italic font-light text-base md:text-lg text-ink/70 max-w-xl mx-auto mb-8">
         &ldquo;{CLOSING_LINE}&rdquo;
       </p>
       <p className="font-mono text-[11px] tracking-widest text-muted uppercase">
@@ -154,9 +160,13 @@ export function Footer() {
         <a className="hover:text-accent transition-colors" href="tel:+923163765386">
           {CONTACT_INFO.phone}
         </a>
+        {"  ·  "}
+        <a className="hover:text-accent transition-colors" href={CONTACT_INFO.portfolio}>
+          alighulam.eduktion.org
+        </a>
       </p>
       <p className="text-xs text-muted mt-4">
-        © {new Date().getFullYear()} Ali Ghulam Hussain — dealt from Hyderabad, Sindh.
+        © {new Date().getFullYear()} Ali Ghulam Hussain · {CONTACT_INFO.role} — dealt from Badin, Sindh.
       </p>
     </footer>
   );
@@ -167,16 +177,19 @@ export function StaticDeck() {
   return (
     <main className="relative z-10 px-6 py-24 max-w-6xl mx-auto">
       <p className="eyebrow text-center">Portfolio deck · {CARDS.length} cards</p>
-      <h1 className="font-display font-semibold text-4xl md:text-6xl text-center mt-4">
+      <h1 className="display font-light text-5xl md:text-7xl text-center mt-4">
         Ali Ghulam Hussain
       </h1>
       <p className="text-center text-muted mt-3">
-        Full-Stack Developer — every card is real, shipped software.
+        {CONTACT_INFO.role} — every card is real, shipped software.
       </p>
 
       {SECTIONS.slice(1).map((s) => (
         <section key={s.id} className="mt-20">
-          <p className="eyebrow mb-8">{HEADINGS[s.id].kicker}</p>
+          <p className="eyebrow mb-8">
+            <span className="text-accent mr-2">{SUITS[s.id].glyph}</span>
+            {HEADINGS[s.id].kicker}
+          </p>
           <div className="flex flex-wrap gap-8 justify-center">
             {CARDS.filter((c) => c.zone === s.id).map((card) => (
               <div key={card.id} className="card-shell static-card">

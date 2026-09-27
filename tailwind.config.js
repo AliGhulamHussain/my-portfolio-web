@@ -4,13 +4,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        canvas: "#F3F5FA",
-        surface: "#FFFFFF",
-        ink: "#10151F",
-        muted: "#5F6774",
-        line: "#E2E7F0",
-        accent: "#2E5BFF",
-        accent2: "#0FB5A0",
+        canvas: "#0A0A0F",
+        surface: "#13131A",
+        ink: "#EDEDED",
+        muted: "#8A8F98",
+        line: "#23242C",
+        accent: "#6E8BFF",
+        accent2: "#3FD3C0",
       },
       fontFamily: {
         display: ["var(--font-display)", "sans-serif"],
